@@ -1,0 +1,875 @@
+MACHINE LEARNING
+
+(Try open in vscode with file type as plain text)
+
+Loading datasets:
+    #Datasets are usually csv(comma separated values) files.
+    #They can be just raw data without any headers or can be data with headers.
+
+    Code for loading data with headers: (use pandas)
+        from pandas import read_csv
+        path = r"C:\iris.csv"
+        data = read_csv(path)
+        print(data.shape)
+
+    Code for loading data without headers: (use pandas)  
+        #we need to specify the header of each column manually while reading.
+        
+        from pandas import read_csv
+        path = r"C:\pima-indians-diabetes.csv"
+        headernames = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']  
+        data = read_csv(path, names=headernames)
+        print(data.shape)
+
+
+Understanding the data:
+        Type 1: (Mathematical way)
+                1. View the data first:
+                        from pandas import read_csv
+                        path = r"C:\pima-indians-diabetes.csv"
+                        headernames = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names=headernames)
+                        print(data.head(50))
+                2. Understand the amount of data you have:
+                        print(data.shape)
+                3. Understand the types of data you have:
+                        print(data.dtypes)
+                4. Understand the statistical summary of the data:
+                        from pandas import read_csv
+                        from pandas import set_option
+                        path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names=names)
+                        set_option('display.width', 100)
+                        set_option('precision', 2)
+                        print(data.shape)
+                        print(data.describe())  
+                5. Reviewing class distribution of the data:
+                        #Having a uniformly distributed data will help in machine learning lest we need to follow other methods for handling such kind of data.
+                        from pandas import read_csv
+                        path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names=names)
+                        count_class = data.groupby('class').size()
+                        print(count_class)
+                6. Reviewing correlation of the dataset:
+                        # We use Pearson's correlation method whose coefficient gives us the amount of linear correlation between a pair of headers. If the data is highly correlated, linear 
+                        # and logistic regression will perform poorly, hence it is important to check this.
+                        #https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#/media/File:Correlation_coefficient.png
+                        from pandas import read_csv
+                        from pandas import set_option
+                        path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names=names)
+                        set_option('display.width', 100)
+                        set_option('precision', 2)
+                        correlations = data.corr(method='pearson')
+                        print(correlations) 
+                7. Checking skewness of the data:
+                        print(data.skew())   
+
+
+
+        Type 2: (Data visualisation or pictorial representation)
+                1. Histograms (univariate):
+                        from matplotlib import pyplot
+                        from pandas import read_csv
+                        path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names=names)
+                        data.hist()
+                        #or try :
+                                data["Parameter_name"].hist();
+                        # or try this to get graph of a single parameter alone:
+                                import seaborn
+                                seaborn.countplot(x = #var , hue = #var, data = #data)
+                        pyplot.show()
+                2. Density plots (univariate):
+                        from matplotlib import pyplot
+                        from pandas import read_csv
+                        path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names=names)
+                        data.plot(kind='density', subplots=True, layout=(3,3), sharex=False)
+                        pyplot.show()     
+                3. Box and Whisker's plot (univariate):
+                        from matplotlib import pyplot
+                        from pandas import read_csv
+                        path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names = names)
+                        data.plot(kind = 'box', subplots = True, layout = (3,3), sharex = False,sharey = False)
+                        pyplot.show()
+                4. Correlation matrix plot (multivariate):
+                        from matplotlib import pyplot
+                        from pandas import read_csv
+                        import numpy
+                        Path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(Path, names = names)
+                        correlations = data.corr()
+                        fig = pyplot.figure()
+                        ax = fig.add_subplot(111)
+                        cax = ax.matshow(correlations, vmin=-1, vmax=1)
+                        fig.colorbar(cax)
+                        ticks = numpy.arange(0,9,1)
+                        ax.set_xticks(ticks)
+                        ax.set_yticks(ticks)
+                        ax.set_xticklabels(names)
+                        ax.set_yticklabels(names)
+                        pyplot.show()
+                5. Scatter matix plot (multivariate):
+                        from matplotlib import pyplot
+                        from pandas import read_csv
+                        from pandas.tools.plotting import scatter_matrix
+                        path = r"C:\pima-indians-diabetes.csv"
+                        names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names = names)
+                        scatter_matrix(data)
+                        pyplot.show()
+
+
+Data pre-processing:
+    # Extremely important since without pre-processing, data wouldnt mean anything to the algorithms.
+
+    1. Scaling: Change all the values to lie in user expected range.
+                from pandas import read_csv
+                from numpy import set_printoptions
+                from sklearn import preprocessing
+                path = r'C:\pima-indians-diabetes.csv'
+                names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                dataframe = read_csv(path, names=names)
+                array = dataframe.values
+                data_scaler = preprocessing.MinMaxScaler(feature_range=(0,1)) # all values will now range between 0 and 1. 
+                data_rescaled = data_scaler.fit_transform(array)
+                set_printoptions(precision=1)
+                print ("\nScaled data:\n", data_rescaled)
+    2. Normalisation: This is used to rescale each row of data to have a length of 1. It is mainly useful in Sparse dataset where we have lots of zeros.
+        L1 Normalisation: modifies the dataset values in a way that in each row the sum of the absolute values will always be up to 1. 
+                from pandas import read_csv
+                from numpy import set_printoptions
+                from sklearn.preprocessing import Normalizer
+                path = r'C:\pima-indians-diabetes.csv'
+                names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                dataframe = read_csv (path, names=names)
+                array = dataframe.values
+                Data_normalizer = Normalizer(norm='l1').fit(array)
+                Data_normalized = Data_normalizer.transform(array)
+                set_printoptions(precision=2)
+                print ("\nNormalized data:\n", Data_normalized)
+        L2 Normalisation: modifies the dataset values in a way that in each row the sum of the squares will always be up to 1.
+                from pandas import read_csv
+                from numpy import set_printoptions
+                from sklearn.preprocessing import Normalizer
+                path = r'C:\pima-indians-diabetes.csv'
+                names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                dataframe = read_csv (path, names=names)
+                array = dataframe.values
+                Data_normalizer = Normalizer(norm='l2').fit(array)
+                Data_normalized = Data_normalizer.transform(array)
+                set_printoptions(precision=2)
+                print ("\nNormalized data:\n", Data_normalized)
+    3. Binarization: To change all the values to either 0 or 1 using a threshold value. Like, values below threshold will be 0 otherwise 1.
+                from pandas import read_csv
+                from numpy import set_printoptions
+                from sklearn.preprocessing import Binarizer                   
+                path = r'C:\pima-indians-diabetes.csv'
+                names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                dataframe = read_csv (path, names=names)
+                array = dataframe.values
+                binarizer = Binarizer(threshold=0.5).fit(array)
+                Data_binarized = binarizer.transform(array)
+                print ("\nBinary data:\n", Data_binarized)
+    4. Standardization: Transform the data attributes with a Gaussian distribution. Mean = 0 and Standard deviation = 1.     
+                from sklearn.preprocessing import StandardScaler
+                from pandas import read_csv
+                from numpy import set_printoptions
+                path = r'C:\pima-indians-diabetes.csv'
+                names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                dataframe = read_csv (path, names=names)
+                array = dataframe.values
+                data_scaler = StandardScaler().fit(array)
+                data_rescaled = data_scaler.transform(array)
+                set_printoptions(precision=2)
+                print ("\nRescaled data:\n", data_rescaled)
+    5. Data labeling: Changing text or words to numbers.
+                
+                var = data['column_name'].unique() 
+                print(var)
+                from sklearn import preprocessing 
+                label_encoder = preprocessing.LabelEncoder() 
+                data['var']= label_encoder.fit_transform(data['var'])
+                data['var'].unique() 
+
+                #or:                
+                        import numpy as np
+                        from sklearn import preprocessing
+                        input_labels = ['red','black','red','green','black','yellow','white'] #input
+                        encoder = preprocessing.LabelEncoder()
+                        encoder.fit(input_labels)
+                        # labeling complete.
+
+                        # checking performance of labeling.
+                        test_labels = ['green','red','black']
+                        encoded_values = encoder.transform(test_labels)
+                        print("\nLabels =", test_labels)
+                        print("Encoded values =", list(encoded_values))
+                        encoded_values = [3,0,4,1]
+                        decoded_list = encoder.inverse_transform(encoded_values)
+                        print("\nEncoded values =", encoded_values)
+                        print("\nDecoded labels =", list(decoded_list))
+    6. Removing null values from data:
+                from pandas import read_csv
+                path = r"C:\iris.csv"
+                data = read_csv(path)
+                print(data.shape)
+                data.isnull().sum()         #this gives the count of null values in each column.
+                #if that column doesn't affect the output, just drop it:
+                data.drop("column_name",axis = 1, inplace = True)
+                # dropping all null values:
+                data.dropna(inplace = True)
+    7. Removing 0s from the table (instead of null, there can be 0s present in the table):
+                from sklearn.preprocessing import Imputer
+
+                fill_values = Imputer(missing_values=0, strategy="mean", axis=0)
+                #we are using mean to substitute 0s (missing_values) in the table
+
+                xtrain = fill_values.fit_transform(xtrain)
+                xtest = fill_values.fit_transform(xtest)
+
+ 
+Data feature selection:
+    # The performance of ML model will be affected negatively if the data features provided to it are irrelevant. 
+    # Relevant data features can increase the accuracy of your ML model especially linear and logistic regression.
+    # Understand that sometimes, less is better.
+
+    1. Univariate selection using chi-square test:
+            from pandas import read_csv
+            from numpy import set_printoptions
+            from sklearn.feature_selection import SelectKBest
+            from sklearn.feature_selection import chi2
+            path = r'C:\pima-indians-diabetes.csv'
+            names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+            dataframe = read_csv(path, names=names)
+            array = dataframe.values
+
+            X = array[:,0:8]  # input components 
+            Y = array[:,8]    #output components
+
+            test = SelectKBest(score_func=chi2, k=4) # find 4 best features that are most important for proper output.
+            fit = test.fit(X,Y)
+
+            set_printoptions(precision=2)
+            print(fit.scores_)
+            featured_data = fit.transform(X)
+            print ("\nFeatured data:\n", featured_data)
+    2. Recursive feature elimination:
+            from pandas import read_csv
+            from sklearn.feature_selection import RFE
+            from sklearn.linear_model import LogisticRegression        
+            path = r'C:\pima-indians-diabetes.csv'
+            names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+            dataframe = read_csv(path, names=names)
+            array = dataframe.values
+
+            X = array[:,0:8]  # input components 
+            Y = array[:,8]    #output components
+
+            model = LogisticRegression()
+            rfe = RFE(model, 3)
+            fit = rfe.fit(X, Y)
+
+            print("Number of Features: %d")  # o/p: 3   
+            print("Selected Features: %s")   # o/p: [ True False False False False True True False]    # best features are marked as True.
+            print("Feature Ranking: %s")     # o/p: [1 2 3 5 6 1 1 4]                                  # best features are ranked as 1.
+    3. Principal component analysis: 
+            from pandas import read_csv
+            from sklearn.decomposition import PCA
+            path = r'C:\pima-indians-diabetes.csv'
+            names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+            dataframe = read_csv(path, names=names)
+            array = dataframe.values
+
+            X = array[:,0:8]  # input components 
+            Y = array[:,8]    #output components
+
+            pca = PCA(n_components = 3)
+            fit = pca.fit(X)
+            print("Explained Variance: %s") % fit.explained_variance_ratio_
+            print(fit.components_)
+    4. Feature importance:
+            from pandas import read_csv
+            from sklearn.ensemble import ExtraTreesClassifier
+            path = r'C:\pima-indians-diabetes.csv'
+            names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+            dataframe = read_csv(path, names=names)
+            array = dataframe.values
+
+            X = array[:,0:8]  # input components 
+            Y = array[:,8]    #output components
+        
+            model = ExtraTreesClassifier()
+            model.fit(X, Y)
+            print(model.feature_importances_)      
+            #Output is the scores for each attribute. The higher the score, higher is the importance of that attribute.
+
+
+Classification: 
+        #Mathematically, classification is the task of approximating a mapping function (f) from input variables (X) to output variables (Y). 
+
+        import sklearn
+        from sklearn.datasets import load_breast_cancer
+        from sklearn.model_selection import train_test_split
+        from sklearn.naive_bayes import GaussianNB
+        from sklearn.metrics import accuracy_score
+
+        data = load_breast_cancer()
+
+        label_names = data['target_names']
+        labels = data['target']
+        feature_names = data['feature_names']
+        features = data['data']
+
+        print(label_names)             # o/p: ['malignant' 'benign']
+        print(feature_names[0])        # o/p: mean radius
+        print(feature_names[1])        # o/p: mean texture
+        print(features[0],features[1])
+
+        #organising data into test and training set - 40% data for testing and 60% data for training
+        train, test, train_labels, test_labels = train_test_split(features,labels,test_size = 0.40, random_state = 42)
+
+        #model evaluation
+        gnb = GaussianNB()
+        model = gnb.fit(train, train_labels)
+
+        preds = gnb.predict(test)
+        print(preds)
+
+        #find the accuracy
+        print(accuracy_score(test_labels,preds))
+
+
+Algorithms:
+
+        1. Classification Algorithms:
+                1. Logistic Regression:
+                        It is used for classification of data. 
+                        Example: we give info about the mails received. Now logistic regression will tell us if a mail is spam or not?.
+                        We try to fit a sigmod curve (S curve with y value ranging btwn 0 and 1) to our dataset and give a threshold like say 0.5, values above threshold are true and below are false.
+                        It always gives us discrete values only unlike linear regression.
+                
+                        #Basic stuff
+                                import pandas as pd 
+                                import numpy as np 
+                                import matplotlib.pyplot as plt 
+                                from sklearn.model_selection import train_test_split
+
+                                path = r"D:\Kaushik\Machine Learning\csv files\User_Data.csv"
+                                dataset = pd.read_csv(path) 
+
+                                #input and output
+                                x = dataset.iloc[:, [2, 3]].values
+                                y = dataset.iloc[:,4].values
+
+                                #splitting the dataset into training and testing
+                                xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size = 0.25, random_state = 0) 
+
+                                #standardisation of values
+                                from sklearn.preprocessing import StandardScaler 
+                                sc_x = StandardScaler() 
+                                xtrain = sc_x.fit_transform(xtrain)  
+                                xtest = sc_x.transform(xtest) 
+                                print(xtrain[:10])
+
+                        #applying logistic regression
+                        from sklearn.linear_model import LogisticRegression 
+                        classifier = LogisticRegression(random_state = 0) 
+                        classifier.fit(xtrain, ytrain) 
+
+                        #testing
+                        y_pred = classifier.predict(xtest)
+
+                        #evaluation of the model and checking accuracy
+                        from sklearn.metrics import confusion_matrix 
+                        cm = confusion_matrix(ytest, y_pred)  
+                        print ("Confusion Matrix : \n", cm) 
+
+                        from sklearn.metrics import accuracy_score 
+                        print ("Accuracy : ", accuracy_score(ytest, y_pred)) 
+
+                        #visualising the performance of the model
+                                from matplotlib.colors import ListedColormap 
+                                X_set, y_set = xtest, ytest 
+                                X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 1,stop = X_set[:, 0].max() + 1, step = 0.01), np.arange(start = X_set[:, 1].min() - 1, stop = X_set[:, 1].max() + 1, step = 0.01)) 
+
+                                plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape), alpha = 0.75, cmap = ListedColormap(('red', 'green'))) 
+
+                                plt.xlim(X1.min(), X1.max()) 
+                                plt.ylim(X2.min(), X2.max()) 
+
+                                for i, j in enumerate(np.unique(y_set)): 
+                                        plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],c = ListedColormap(('red', 'green'))(i), label = j) 
+                                        
+                                plt.title('Classifier (Test set)') 
+                                plt.xlabel('Age') 
+                                plt.ylabel('Estimated Salary') 
+                                plt.legend() 
+                                plt.show() 
+
+                2. Naive Bayes:
+                        It uses Bayes theorem which is a conditional probability equatioon or formula.
+                        There are few assumptions:
+                                1. The presence of a feature in a class is independent to the presence of any other feature in the same class.
+                                2. Though all these features are dependent on each other, they contribute independently to the probability of that the phone is a smart phone.
+
+                        from pandas import read_csv
+                        from sklearn.model_selection import train_test_split 
+                        from sklearn.naive_bayes import GaussianNB 
+
+                        #Basic stuff
+                                path = r"D:\Kaushik\Machine Learning\csv files\iris.data"
+                                data = read_csv(path) 
+                                array = data.values
+                                print(array.shape)
+
+                                x = array[0:149,0:4]
+                                y = array[:,4]
+
+                                X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=1)
+
+                        #Naive Bayes 
+                        gnb = GaussianNB() 
+                        gnb.fit(X_train, y_train) 
+
+                        #predicting
+                        y_pred = gnb.predict(X_test) 
+
+                        #accuracy
+                        print("Gaussian Naive Bayes model accuracy(in %):", metrics.accuracy_score(y_test, y_pred)*100)
+                
+                3. Decision Tree:
+                        #Basic stuff
+                                import pandas as pd
+                                from sklearn.tree import DecisionTreeClassifier
+                                from sklearn.model_selection import train_test_split
+
+                                col_names = ['pregnant', 'glucose', 'bp', 'skin', 'insulin', 'bmi', 'pedigree', 'age', 'label']
+                                pima = pd.read_csv(r"C:\pima-indians-diabetes.csv", header = None, names = col_names)
+                                pima.head()
+
+                                feature_cols = ['pregnant', 'insulin', 'bmi', 'age','glucose','bp','pedigree']
+                                X = pima[feature_cols] # Features
+                                y = pima.label # Target variable
+
+                                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 1)
+
+                        #Decision tree
+                        clf = DecisionTreeClassifier()
+                        clf = clf.fit(X_train,y_train)
+
+                        y_pred = clf.predict(X_test)
+
+                        #accuracy
+                        from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+                        result = confusion_matrix(y_test, y_pred)
+                        print("Confusion Matrix:")
+                        print(result)
+                        result1 = classification_report(y_test, y_pred)
+                        print("Classification Report:",)
+                        print (result1)
+                        result2 = accuracy_score(y_test,y_pred)
+                        print("Accuracy:",result2)
+
+                4. Random Forest:
+                        It uses many number of decision trees to give an output.
+                        It is better than decision trees because it reduces over fitting.
+                        It gets output from n number of decision trees and takes the average of the n and gives it as the result.
+                        #basic stuff
+                                import numpy as np
+                                import matplotlib.pyplot as plt
+                                import pandas as pd
+                                from sklearn.model_selection import train_test_split
+
+                                path = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+                                headernames = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'Class']
+                                dataset = pd.read_csv(path, names = headernames)
+                                dataset.head()
+
+                                X = dataset.iloc[:, :-1].values
+                                y = dataset.iloc[:, 4].values
+
+                                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.30)
+
+                        #Random Forest
+                        from sklearn.ensemble import RandomForestClassifier
+                        classifier = RandomForestClassifier(n_estimators = 50)
+                        classifier.fit(X_train, y_train)
+
+                        #testing
+                        y_pred = classifier.predict(X_test)
+
+                        #accuracy
+                        from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+                        result = confusion_matrix(y_test, y_pred)
+                        print("Confusion Matrix:")
+                        print(result)
+                        result1 = classification_report(y_test, y_pred)
+                        print("Classification Report:",)
+                        print (result1)
+                        result2 = accuracy_score(y_test,y_pred)
+                        print("Accuracy:",result2)
+
+                5. Support Vector Machines:
+                        These help in creating a boundary and thereby segregating the data into the respective classifiers.
+                        Reference: https://www.javatpoint.com/machine-learning-support-vector-machine-algorithm
+                        NOTE: There is linear and non-linear svm. Linear uses 2d graph and non-linear uses 3d graph.
+
+                        #Basic stuff
+                                import numpy as nm  
+                                import matplotlib.pyplot as mtp  
+                                import pandas as pd  
+                                
+                                #importing datasets  
+                                data_set= pd.read_csv('user_data.csv')  
+                                
+                                #Extracting Independent and dependent Variable  
+                                x= data_set.iloc[:, [2,3]].values  
+                                y= data_set.iloc[:, 4].values  
+                                
+                                # Splitting the dataset into training and test set.  
+                                from sklearn.model_selection import train_test_split  
+                                x_train, x_test, y_train, y_test= train_test_split(x, y, test_size= 0.25, random_state=0)  
+                                #feature Scaling  
+                                from sklearn.preprocessing import StandardScaler    
+                                st_x= StandardScaler()    
+                                x_train= st_x.fit_transform(x_train)    
+                                x_test= st_x.transform(x_test)       
+
+                        #SVM classifier
+                        from sklearn.svm import SVC # "Support vector classifier"  
+                        classifier = SVC(kernel='linear', random_state=0)  
+                        classifier.fit(x_train, y_train)  
+
+                        #testing
+                        y_pred= classifier.predict(x_test) 
+
+                        #accuracy
+                        from sklearn.metrics import confusion_matrix  
+                        cm = confusion_matrix(y_test, y_pred)  
+
+                        #visualisation
+                        #training set
+                                from matplotlib.colors import ListedColormap  
+                                x_set, y_set = x_train, y_train  
+                                x1, x2 = nm.meshgrid(nm.arange(start = x_set[:, 0].min() - 1, stop = x_set[:, 0].max() + 1, step  =0.01),  
+                                nm.arange(start = x_set[:, 1].min() - 1, stop = x_set[:, 1].max() + 1, step = 0.01))  
+                                mtp.contourf(x1, x2, classifier.predict(nm.array([x1.ravel(), x2.ravel()]).T).reshape(x1.shape),  
+                                alpha = 0.75, cmap = ListedColormap(('red', 'green')))  
+                                mtp.xlim(x1.min(), x1.max())  
+                                mtp.ylim(x2.min(), x2.max())  
+                                for i, j in enumerate(nm.unique(y_set)):  
+                                mtp.scatter(x_set[y_set == j, 0], x_set[y_set == j, 1],  
+                                        c = ListedColormap(('red', 'green'))(i), label = j)  
+                                mtp.title('SVM classifier (Training set)')  
+                                mtp.xlabel('Age')  
+                                mtp.ylabel('Estimated Salary')  
+                                mtp.legend()  
+                                mtp.show() 
+                        #test result
+                                from matplotlib.colors import ListedColormap  
+                                x_set, y_set = x_test, y_test  
+                                x1, x2 = nm.meshgrid(nm.arange(start = x_set[:, 0].min() - 1, stop = x_set[:, 0].max() + 1, step  =0.01),  
+                                nm.arange(start = x_set[:, 1].min() - 1, stop = x_set[:, 1].max() + 1, step = 0.01))  
+                                mtp.contourf(x1, x2, classifier.predict(nm.array([x1.ravel(), x2.ravel()]).T).reshape(x1.shape),  
+                                alpha = 0.75, cmap = ListedColormap(('red','green' )))  
+                                mtp.xlim(x1.min(), x1.max())  
+                                mtp.ylim(x2.min(), x2.max())  
+                                for i, j in enumerate(nm.unique(y_set)):  
+                                mtp.scatter(x_set[y_set == j, 0], x_set[y_set == j, 1],  
+                                        c = ListedColormap(('red', 'green'))(i), label = j)  
+                                mtp.title('SVM classifier (Test set)')  
+                                mtp.xlabel('Age')  
+                                mtp.ylabel('Estimated Salary')  
+                                mtp.legend()  
+                                mtp.show()
+
+
+        2. Regression Algorithms:
+                1. Linear Regression:
+                        It predicts a value for a given x.
+                        The output depends only on one variable - x.
+                        It uses a linear function f(x) = y.
+                        It gives a continuous value as output.
+
+                        #creating the graph
+                        import matplotlib.pyplot as plt
+                        from scipy import stats
+
+                        x = [5,7,8,7,2,17,2,9,4,11,12,9,6]
+                        y = [99,86,87,88,111,86,103,87,94,78,77,85,86]
+
+                        slope, intercept, r, p, std_err = stats.linregress(x, y)
+
+                        def myfunc(x):
+                        return slope * x + intercept
+
+                        mymodel = list(map(myfunc, x))
+
+                        plt.scatter(x, y)
+                        plt.plot(x, mymodel)
+                        plt.show() 
+
+                        #predicting output for a given input
+                        speed = myfunc(10)
+                        print(speed) 
+
+                        #Checking the fit - r^2 value
+                        #NOTE: The r-squared value ranges from 0 to 1, where 0 means no relationship, and 1 means 100% related.
+                        print(r)
+
+                2. Multiple Regression:
+                        It predicts a value for a given x.
+                        The output depends only on one variable - x.
+                        It uses a linear function f(x) = y.
+                        It gives a continuous value as output.
+
+                        import pandas
+                        from sklearn import linear_model
+
+                        df = pandas.read_csv("cars.csv")
+
+                        X = df[['Weight', 'Volume']]
+                        y = df['CO2']
+
+                        regr = linear_model.LinearRegression()
+                        regr.fit(X, y)
+
+                        #predict the CO2 emission of a car where the weight is 2300g, and the volume is 1300ccm:
+                        predictedCO2 = regr.predict([[2300, 1300]])
+
+                        print(predictedCO2)
+
+                        #coefficient values
+                        print(regr.coef_)
+
+                3. Polynomial Regression:
+                        It predicts a value for a given x.
+                        It finds a polynomial function f(x) = y that connect the points.
+                        It gives a continuous value as output.
+
+                        import numpy
+                        import matplotlib.pyplot as plt
+
+                        x = [1,2,3,5,6,7,8,9,10,12,13,14,15,16,18,19,21,22]
+                        y = [100,90,80,60,60,55,60,65,70,70,75,76,78,79,90,99,99,100]
+
+                        mymodel = numpy.poly1d(numpy.polyfit(x, y, 3))
+
+                        myline = numpy.linspace(1, 22, 100)
+
+                        plt.scatter(x, y)
+                        plt.plot(myline, mymodel(myline))
+                        plt.show()       
+
+                        #predicting values
+                        speed = mymodel(17)
+                        print(speed) 
+
+                        #Checking the fit - r^2 value
+                        #NOTE: The r-squared value ranges from 0 to 1, where 0 means no relationship, and 1 means 100% related.
+                        from sklearn.metrics import r2_score
+                        print(r2_score(y, mymodel(x))) 
+
+
+        3. Clustering Algorithms:
+                1. K-means Clustering:
+                        Computes the centroids and iterates until we it finds optimal centroid.
+                        Data is not labelled.
+                        Here, K stands for the number of clusters. Also known as flat clustering.
+                        It assumes that the number of clusters are already known.  
+                        The sum of the squared distance between the data points and centroid would be minimum.
+
+                        Implementation 1:
+                                import matplotlib.pyplot as plt
+                                import seaborn as sns
+                                sns.set()
+                                import numpy as np
+                                from sklearn.cluster import KMeans
+
+                                #creating data
+                                from sklearn.datasets.samples_generator import make_blobs
+                                X, y_true = make_blobs(n_samples = 400, centers = 4, cluster_std = 0.60, random_state = 0)
+
+                                #viewing data
+                                plt.scatter(X[:, 0], X[:, 1], s = 20);
+                                plt.show()
+
+                                #K-means clustering
+                                kmeans = KMeans(n_clusters = 4)
+                                kmeans.fit(X)
+                                y_kmeans = kmeans.predict(X)
+
+                                #plot and visualise
+                                from sklearn.datasets.samples_generator import make_blobs
+                                X, y_true = make_blobs(n_samples = 400, centers = 4, cluster_std = 0.60, random_state = 0)
+                                plt.scatter(X[:, 0], X[:, 1], c = y_kmeans, s = 20, cmap = 'summer')
+                                centers = kmeans.cluster_centers_
+                                plt.scatter(centers[:, 0], centers[:, 1], c = 'blue', s = 100, alpha = 0.9);
+                                plt.show()
+                        Implementation 2:
+                                %matplotlib inline
+                                import matplotlib.pyplot as plt
+                                import seaborn as sns; sns.set()
+                                import numpy as np
+                                from sklearn.cluster import KMeans
+
+                                from sklearn.datasets import load_digits
+                                digits = load_digits()
+                                digits.data.shape
+
+                                #K-means clustering
+                                kmeans = KMeans(n_clusters = 10, random_state = 0)
+                                clusters = kmeans.fit_predict(digits.data)
+                                kmeans.cluster_centers_.shape
+
+                                #We will get following image showing clusters centers learned by k-means.
+                                fig, ax = plt.subplots(2, 5, figsize=(8, 3))
+                                centers = kmeans.cluster_centers_.reshape(10, 8, 8)
+                                for axi, center in zip(ax.flat, centers):
+                                axi.set(xticks=[], yticks=[])
+                                axi.imshow(center, interpolation='nearest', cmap=plt.cm.binary)
+
+                                from scipy.stats import mode
+                                labels = np.zeros_like(clusters)
+                                for i in range(10):
+                                mask = (clusters == i)
+                                labels[mask] = mode(digits.target[mask])[0]
+
+                                #accuracy
+                                from sklearn.metrics import accuracy_score
+                                accuracy_score(digits.target, labels)
+
+                2. Mean Shift Clustering:
+                        It is same as K-means but here you dont have to give the number of clusters - K value.
+                        K value will be calculated by the algorithm itself.
+
+                        %matplotlib inline
+                        import numpy as np
+                        from sklearn.cluster import MeanShift
+                        import matplotlib.pyplot as plt
+                        from matplotlib import style
+                        style.use("ggplot")
+                        from sklearn.datasets.samples_generator import make_blobs
+                        centers = [[3,3,3],[4,5,5],[3,10,10]]
+                        X, _ = make_blobs(n_samples = 700, centers = centers, cluster_std = 0.5)
+                        plt.scatter(X[:,0],X[:,1])
+                        plt.show()
+
+                        #mean shift
+                        ms = MeanShift()
+                        ms.fit(X)
+                        labels = ms.labels_
+                        cluster_centers = ms.cluster_centers_
+                        print(cluster_centers)
+                        n_clusters_ = len(np.unique(labels))
+                        print("Estimated clusters:", n_clusters_)
+                        colors = 10*['r.','g.','b.','c.','k.','y.','m.']
+
+                        for i in range(len(X)):
+                        plt.plot(X[i][0], X[i][1], colors[labels[i]], markersize = 3)
+                        plt.scatter(cluster_centers[:,0],cluster_centers[:,1],
+                        marker = ".",color = 'k', s = 20, linewidths = 5, zorder = 10)
+                        plt.show()
+
+                3. Hierarchal Clustering:
+                        import matplotlib.pyplot as plt
+                        import pandas as pd
+                        %matplotlib inline
+                        import numpy as np
+                        from pandas import read_csv
+                        path = r"C:\pima-indians-diabetes.csv"
+                        headernames = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+                        data = read_csv(path, names = headernames)
+                        array = data.values
+                        X = array[:,0:8]
+                        Y = array[:,8]
+                        data.head()
+
+                        #making dendogram
+                        patient_data = data.iloc[:, 3:5].values
+                        import scipy.cluster.hierarchy as shc
+                        plt.figure(figsize = (10, 7))
+                        plt.title("Patient Dendograms")
+                        dend = shc.dendrogram(shc.linkage(data, method = 'ward')
+
+                        #plotting hierarchal clusters
+                        from sklearn.cluster import AgglomerativeClustering
+                        cluster = AgglomerativeClustering(n_clusters = 4, affinity = 'euclidean', linkage = 'ward')
+                        cluster.fit_predict(patient_data)
+                        plt.figure(figsize = (10, 7))
+                        plt.scatter(patient_data[:,0], patient_data[:,1], c = cluster.labels_, cmap = 'rainbow')
+
+
+        4. KNN Algorithms:
+                1. Finding Nearest Neighbour Algorithm:
+                        It finds k nearest neighbours to a given point and then decides which cluster the point belongs to.
+
+                        As a Classifier:
+                                import numpy as np
+                                import matplotlib.pyplot as plt
+                                import pandas as pd
+                                path = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+                                headernames = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'Class']
+                                dataset = pd.read_csv(path, names = headernames)
+                                dataset.head()
+
+                                X = dataset.iloc[:, :-1].values
+                                y = dataset.iloc[:, 4].values
+
+                                from sklearn.model_selection import train_test_split
+                                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.40)
+
+                                from sklearn.preprocessing import StandardScaler
+                                scaler = StandardScaler()
+                                scaler.fit(X_train)
+                                X_train = scaler.transform(X_train)
+                                X_test = scaler.transform(X_test)
+
+                                #k nearest neighbours
+                                from sklearn.neighbors import KNeighborsClassifier
+                                classifier = KNeighborsClassifier(n_neighbors = 8)
+                                classifier.fit(X_train, y_train)
+
+                                y_pred = classifier.predict(X_test)
+
+                                #accuracy
+                                from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+                                result = confusion_matrix(y_test, y_pred)
+                                print("Confusion Matrix:")
+                                print(result)
+                                result1 = classification_report(y_test, y_pred)
+                                print("Classification Report:",)
+                                print (result1)
+                                result2 = accuracy_score(y_test,y_pred)
+                                print("Accuracy:",result2)
+                        As a Regressor:
+                                import numpy as np
+                                import pandas as pd 
+
+                                path = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+                                headernames = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'Class']
+                                data = pd.read_csv(url, names = headernames)
+                                array = data.values
+                                X = array[:,:2]
+                                Y = array[:,2]
+                                print(data.shape)
+
+                                from sklearn.neighbors import KNeighborsRegressor
+                                knnr = KNeighborsRegressor(n_neighbors = 10)
+                                knnr.fit(X, y)
+
+                                print ("The MSE is:",format(np.power(y-knnr.predict(X),2).mean()))
+
+
+
+
