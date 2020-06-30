@@ -1,6 +1,6 @@
 MACHINE LEARNING
 
-(Try open in vscode with file type as plain text)
+(Try opening it in vscode with file type as plain text)
 
 Loading datasets:
     #Datasets are usually csv(comma separated values) files.
