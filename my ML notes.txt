@@ -629,7 +629,7 @@ Algorithms:
 
                 2. Multiple Regression:
                         It predicts a value for a given x.
-                        The output depends only on one variable - x.
+                        The output depends on more than 1 variable unlike linear regression.
                         It uses a linear function f(x) = y.
                         It gives a continuous value as output.
 
