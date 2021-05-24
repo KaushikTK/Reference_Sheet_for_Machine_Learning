@@ -1,6 +1,6 @@
 MACHINE LEARNING
 
-(Try opening it in vscode with file type as plain text)
+(Try opening in vscode with file type as plain text)
 
 Loading datasets:
     #Datasets are usually csv(comma separated values) files.
@@ -629,7 +629,7 @@ Algorithms:
 
                 2. Multiple Regression:
                         It predicts a value for a given x.
-                        The output depends on more than 1 variable unlike linear regression.
+                        The output depends only on one variable - x.
                         It uses a linear function f(x) = y.
                         It gives a continuous value as output.
 
@@ -872,4 +872,89 @@ Algorithms:
 
 
 
+Learning Algorithms or rules for supervised learning
+----------------------------------------------------
+# x is in input and y is output
 
+Hebb's rule
+> change in weight(i) = x(i) * target
+
+Perceptron learning rule
+ 1. if target - y = 0 => no change in weight
+ 2. if target - y < 0 => increase the weight
+ 3. if target - y > 0 => decrease the weight
+
+> learning rate is defined and is denoted as lr.
+
+> change in w(i) = lr * x(i) * (target(i) - y_out(i))
+
+Delta/Least mean square/Widrow-Hoff learning rule
+> change in w(i) = lr * x(i) * (target(i) - y_in(i))
+
+> Only identity function can be used as the activation function
+
+Extended delta rule
+> change in w(i) = lr * x(i) * (target(i) - y_out(i)) * activ_function'(y_in)
+
+> activation function can be anything here and first derivative of it is used.
+
+
+
+McCulloch - Pitts Neural Model
+-------------------------------
+> say there are m+n inputs and say
+	1. m inputs have excitatory effect on the output => +ve weights
+	2. n inputs have inhibitory effect on the output => -ve weights
+
+According to this model, even if one inhibitory input fires, the output will be 0 irrespective of the number of positive neurons firing. This can be mathematically expressed as:
+
+y_in = sum(xi * wi) + sum(xj * wj) where wj is -ve and wi is +ve
+
+Precisely, sum(xi * wi) - w < threshold => y_out = 0 where w is the inhibitory weight of of a single neuron.
+
+
+
+Pattern Association:
+The task of relating the given input (say s) with its corresponding output pattern (say t) is known as pattern association.
+It's power relies on how good it is in recognising a noisy input but it is only to a certain extent.
+
+Associative Memory Neural Nets:
+Neural nets which can store patters. Two types:
+1. Auto associative (No. of input neurons = No. of output neurons)
+2. Hetero associative (No. of input neurons != No. of output neurons)
+[It can be either feedforward or recurrent nn]
+
+Auto associative neural nets:
+Training: Hebbs or Delta or Extended Delta
+
+Consider feedforward neural network trained using Hebbs (inputs are bipolar)
+Say we want to store the pattern 's' => [1 -1 -1 1]
+Weight matrix 'W' => s(transpose) X s
+Activation function => bipolar step fn
+
+It is a good practice to make the diagonal of the weight matrix as 0 so that the nn learns the pattern instead of just outputting the input string.
+Even when the diagonal is set to 0, it recognizes the pattern.
+
+Checking the strength of the NN:
+1. The input can contain erroneous data [giving 1 instead of -1]
+2. Missing values in the input [sub value as 0]
+
+Note:
+> While making the nn recognise more than 1 pattern, all the patterns shld be mutually orthogonal. Say 2 vectors X=[x1,x2...,xn] and Y=[y1,y2,..yn] => sum( X.Y) = 0 .
+
+> Find the weight matrix of all the patterns separately and then add all the weight matrices to get the weight matrix of the associative net.
+W(nn) = W(pattern 1) + W(pattern 2) + ...+ W(pattern n)
+{W of all the patterns are set to 0}
+
+> 'n' input auto associative net can store only 'n-1' patterns
+
+Hetero associative neural nets:
+No. of input neurons is not necessarily equal to the no. of output neurons.
+
+Learning can again be done using Hebbs or Delta or Extended Delta
+Here, consider Hebbs rule.
+Say the input is s and the target is T => weight matrix 'W' = s(transpose) X T
+
+W(net) = W(pattern 1) + W(pattern 2) + .. + W(pattern n) 
+
+ 
